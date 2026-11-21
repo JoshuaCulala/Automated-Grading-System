@@ -1,190 +1,83 @@
-# Automated Grading System
+# College Automated Grading System
 
-A console-based Java application that automates academic grade calculation:
-entering a set of numeric grades produces a final average, a letter grade,
-and a pass/fail status — replacing repetitive manual calculation with a
-deterministic, repeatable process.
-
-## Overview
-
-The system follows a single, clear workflow:
-
-```
-Input -> Validation -> Calculation -> Conditional Evaluation -> Output
-```
-
-The user enters one or more numeric grades. Each entry is validated before
-it's accepted. Once all grades are collected, the system calculates the
-average, evaluates it against the configured grading rules, and displays
-the result.
-
-## Features
-
-- Console-based grade entry for any number of grades
-- Centralized input validation (empty input, non-numeric input, negative
-  values, out-of-range values) with clear, non-technical error messages
-- Deterministic calculation: the same inputs always produce the same result
-- Letter-grade and pass/fail evaluation based on a single, centrally
-  configured set of rules
-- Clean separation between input, validation, calculation, evaluation, and
-  output — each handled by its own class
-- Ability to run multiple grade calculations in one session
-- A dependency-free self-test harness covering the calculation, evaluation,
-  and validation logic
-
-## Technologies
-
-- Java
-- JDK (standard library only — no external frameworks or libraries)
+A beginner-friendly Java program that runs entirely in the command line.
+It asks for a student's subjects and grades, then computes the GWA and
+prints a clean grade report.
 
 ## Project Structure
 
 ```
 AutomatedGradingSystem/
-├── src/
-│   ├── Main.java              # Orchestrates the workflow
-│   ├── GradeInput.java        # Console input collection
-│   ├── Validation.java        # Centralized input validation
-│   ├── GradeCalculator.java   # Mathematical calculation (average)
-│   ├── GradeEvaluator.java    # Conditional evaluation (letter grade, pass/fail)
-│   ├── GradeResult.java       # Holds and displays a completed result
-│   ├── GradingConfig.java     # Centralized, configurable grading rules
-│   └── GradingSystemTest.java # Self-test harness (no external framework)
+├── src/Main.java   # The whole program
+├── run.bat         # Compile and run (Windows)
+├── run.sh          # Compile and run (macOS / Linux)
 └── README.md
 ```
 
-Each class has a single responsibility, so the grading rules, the
-calculation, and the input handling can each be changed independently.
+## How to Run
 
-## Grading Logic
+Requires a JDK (Java 8 or later).
 
-**CONFIGURABLE ASSUMPTION:** The project requirements did not specify an
-exact grading formula or letter-grade thresholds. Rather than inventing
-rules and mixing them into the calculation code, this implementation uses
-a common, standard percentage-based scale and isolates every threshold in
-`GradingConfig.java`, so the actual rules can be reviewed and changed in
-one place without touching any other class.
+**Easiest:** double-click `run.bat` (Windows) or run `./run.sh` (macOS/Linux).
 
-The final grade is calculated as the **arithmetic mean** of all entered
-grades. That average is then evaluated as follows:
+**Manually**, from the project folder:
 
-| Average Range | Letter Grade |
-|---|---|
-| 90 – 100 | A |
-| 80 – 89.99 | B |
-| 70 – 79.99 | C |
-| 60 – 69.99 | D |
-| Below 60 | F |
-
-**Pass/fail threshold:** an average of 60 or above is a **PASS**; below 60
-is a **FAIL**.
-
-If your actual grading rules differ, update the constants in
-`GradingConfig.java` — no other file needs to change.
-
-## Input Requirements
-
-- Each grade must be a number (decimals are allowed, e.g., `87.5`).
-- Each grade must be within the range **0–100**.
-- Empty input, non-numeric input, negative values, and values above 100
-  are all rejected with a specific error message, and the user is
-  re-prompted rather than allowed to proceed with bad data.
-
-## How to Compile and Run
-
-Requires a JDK (Java 8 or later; developed and written against Java 21
-syntax/behavior).
-
-From the project's root directory:
-
-```bash
-# Compile
-javac -d out src/*.java
-
-# Run the application
+```
+javac -d out src/Main.java
 java -cp out Main
-
-# Run the self-test harness
-java -cp out GradingSystemTest
 ```
 
-## Example Usage
+## How It Works
+
+1. Shows the welcome screen.
+2. Asks for the student's full name and number of subjects.
+3. Loops once per subject, asking for the subject name and grade.
+4. Rejects any grade not in the scale (e.g. 1.30, 2.80, 4.00) and asks again.
+5. Computes `GWA = sum of grades / number of subjects` (equal units).
+6. Prints the report: name, subject count, each subject with its grade,
+   description and PASSED/FAILED remark, the GWA, and the overall standing.
+
+## Grading Scale
+
+| Grade | Description |
+|---|---|
+| 1.00 | Excellent |
+| 1.25, 1.50, 1.75 | Very Good |
+| 2.00, 2.25 | Good |
+| 2.50, 2.75 | Satisfactory |
+| 3.00 | Passed |
+| 5.00 | Failed |
+
+A subject is **PASSED** with 1.00 – 3.00 and **FAILED** with 5.00.
+
+## Overall Academic Standing
+
+If any subject is failed, the standing is **Needs Improvement**. Otherwise it
+follows the GWA: up to 1.25 Excellent, up to 1.75 Very Good, up to 2.25 Good,
+up to 2.75 Satisfactory, and up to 3.00 Passing.
+
+## Sample Output
 
 ```
-=====================================
-   AUTOMATED GRADING SYSTEM
-=====================================
-How many grades would you like to enter? 3
-Enter grade #1 (0-100): 85
-Enter grade #2 (0-100): 92
-Enter grade #3 (0-100): 78
-
-========== GRADE RESULT ==========
-Entered grades: [85.0, 92.0, 78.0]
-Final grade (average): 85.00
-Letter grade: B
-Status: PASS
-===================================
-
-Calculate another grade? (y/n): n
-
-Thank you for using the Automated Grading System.
+============================================================
+              COLLEGE AUTOMATED GRADING SYSTEM
+============================================================
+...
+===============================================================
+                         GRADE REPORT
+===============================================================
+Student Name   : Juan Dela Cruz
+Total Subjects : 3
+---------------------------------------------------------------
+Subject                         Grade    Description   Remarks
+---------------------------------------------------------------
+Programming 2                   1.25     Very Good     PASSED
+Data Structures and Algorithms  5.00     Failed        FAILED
+Web Systems                     2.00     Good          PASSED
+---------------------------------------------------------------
+Computed GWA     : 2.75
+Subjects Passed  : 2
+Subjects Failed  : 1
+Academic Standing: Needs Improvement (1 failed subject)
+===============================================================
 ```
-
-## Testing
-
-`GradingSystemTest.java` is a lightweight, dependency-free self-test
-harness (no JUnit or other testing framework is used, in line with the
-project's "no unnecessary technologies" constraint). It exercises:
-
-- **Calculation logic** — average of multiple grades, average of a single
-  grade
-- **Evaluation logic** — every letter-grade boundary (just below and
-  exactly on each threshold), and the pass/fail boundary
-- **Validation logic** — empty input, whitespace-only input, non-numeric
-  input, negative values, and out-of-range values are all rejected; valid
-  boundary values (0, 100) and valid decimals are accepted
-
-Run it with `java -cp out GradingSystemTest` after compiling. It prints a
-`[PASS]`/`[FAIL]` line per case and a final summary count.
-
-> **Note:** This code was written and reviewed for correctness, but it has
-> not been compiled or executed in the environment that produced it (no
-> JDK compiler was available there). Please compile and run it — including
-> the self-test harness — in your own environment before relying on it, and
-> report back if anything doesn't behave as documented here.
-
-## Edge Cases Covered by Design and Tests
-
-- Minimum valid grade (0) and maximum valid grade (100)
-- Values immediately below, exactly on, and immediately above each
-  letter-grade threshold
-- The pass/fail boundary (59.9 vs. 60.0)
-- Decimal grade values
-- Empty and whitespace-only input
-- Non-numeric input
-- Negative values
-- Values above the valid range
-
-## Future Improvements
-
-The following are potential future directions only — **none of them are
-implemented** in the current version:
-
-- Persistent storage of student records
-- Database integration
-- User authentication / teacher and student accounts
-- A web-based or graphical interface
-- Exportable grade reports
-- Weighted (rather than simple-average) grading schemes
-- Statistical grade analysis across multiple students
-
-## Known Limitations
-
-- Console-only interface; no graphical or web UI.
-- No persistence — results exist only for the duration of the program run.
-- Grading is a simple average of equally weighted entries; weighted
-  categories (e.g., exams vs. homework) are not implemented.
-- The letter-grade and pass/fail thresholds are a configurable assumption,
-  not a confirmed institutional grading policy — adjust `GradingConfig.java`
-  to match your actual requirements.
